@@ -135,10 +135,20 @@ def AnswerQuestions(Question):
     req.add_headers = headers
     Search = Response.replace(" ", "+")
     print(Search)
-    url = 'http://www.bbc.co.uk/search?q=brexit&filter=news' + Search
+    url = 'http://www.bbc.co.uk/search?q=' + Search + '&filter=news'
     req = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
     con = urllib2.urlopen(req)
-    print(len((con.read()).split("<article")))
+    ArticleUrl = (con.read()).split("<article")[1].split('href="')[1].split('"')[0]
+    req2 = urllib2.Request(ArticleUrl, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
+    con2 = urllib2.urlopen(req2)
+    try:
+        print(BeautifulSoup('<p class="story-body__introduction"' + ((con2.read()).split('class="story-body__introduction"')[1].split("</p>")[0]) + "</p>").get_text())
+    except:
+        try:
+            print(con2.read())
+            print(BeautifulSoup('<p class="first"' + ((con2.read()).split('class="first"')[1].split("</p>")[0]) + "</p>").get_text())
+        except:
+            print("Sorry, python is rubbish. JavaScript is the future")
 #try:
 #    print(BeautifulSoup("<div" + ((con.read()).split("<span")[30]).split("<div")[24]).get_text())
 # except:

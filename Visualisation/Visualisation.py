@@ -13,6 +13,8 @@ CurrentShapes = [0]*len(Scores)
 
 CurrentShapesDone = ["false"]*len(Scores)
 
+CurrentShapesCenter = [25]*len(Scores)
+
 Current = 0
 
 def createShape(Num):
@@ -30,7 +32,7 @@ def createShape(Num):
             #Shape[i].draw(Window)
         else:
             Range = int(random.randrange(1, 5))
-            if(Range == 30):
+            if(Range == 3):
                 Shape.append(Rectangle(Point(((StartPos[0] + (i*50))-50)-(NumOffset*50), StartPos[1]-50), Point(((StartPos[0] + (i*50)))-(NumOffset*50), StartPos[1])))
                 NumOffset = NumOffset + 1
             elif(Range == 4):
@@ -38,6 +40,7 @@ def createShape(Num):
                 NumOffset = NumOffset + 1
             else:
                 Shape.append(Rectangle(Point((StartPos[0] + (i*50))-(NumOffset*50), StartPos[1]), Point(((StartPos[0] + (i*50))+50)-(NumOffset*50), StartPos[1] + 50)))
+                CurrentShapesCenter[Num] = CurrentShapesCenter[Num] + 25
         Shape[i].setFill(ShapeColor)
         Shape[i].draw(Window)
     CurrentShapes[Num] = Shape
@@ -53,12 +56,22 @@ while Playing == True:
         for i in range(0,len(CurrentShapes[Current])):
             CurrentShapes[Current][i].move(0, 25)
         keyPressed = Window.getKey()
+        if(keyPressed == "Escape"):
+            Playing = False
+            print(Playing)
+            break
         if(keyPressed == "Left"):
             for i in range(0,len(CurrentShapes[Current])):
-                CurrentShapes[Current][i].move(-50, 0)
+                if((CurrentShapes[Current][i].getCenter().getX() - 25) <= 0):
+                    break
+                else:
+                    CurrentShapes[Current][i].move(-50, 0)
         elif(keyPressed == "Right"):
             for i in range(0,len(CurrentShapes[Current])):
-                CurrentShapes[Current][i].move(50, 0)
+                if((CurrentShapes[Current][i].getCenter().getX() + 25) >= Window.width):
+                    break
+                else:
+                    CurrentShapes[Current][i].move(50, 0)
         elif(keyPressed == "Up" or keyPressed == "r"):
             print("ROTATE")
         
@@ -84,7 +97,7 @@ while Playing == True:
                         #print("Score = " + str(CurrentShapes[Current][i].getCenter().getY() + 27) + " and the other thing = " + str((CurrentShapes[e][o].getCenter().getY()) - 27) + " and " + str(CurrentShapesDone[e]))
                         # Window.plot(CurrentShapes[Current][i].getCenter().getX(),CurrentShapes[Current][i].getCenter().getY() + 27, "red")
                         # Window.plot(CurrentShapes[e][o].getCenter().getX(),CurrentShapes[e][o].getCenter().getY() - 27, "red")
-                        if((CurrentShapes[Current][i].getCenter().getY() + 27) >= (CurrentShapes[e][o].getCenter().getY() - 27) and (CurrentShapes[Current][i].getCenter().getX()) == (CurrentShapes[e][o].getCenter().getX())):
+                        if((CurrentShapes[Current][i].getCenter().getY() + 27) >= (CurrentShapes[e][o].getCenter().getY() - 27) and (CurrentShapes[Current][i].getCenter().getY() - 27) <= (CurrentShapes[e][o].getCenter().getY() + 27)  and (CurrentShapes[Current][i].getCenter().getX()) == (CurrentShapes[e][o].getCenter().getX())):
                             print("Same")
                             Current = Current + 1
                             CurrentShapesDone[Current] = "true"

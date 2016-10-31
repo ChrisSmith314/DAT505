@@ -26,86 +26,85 @@ Site = "www.twitter.com"
 
 Now = 0
     
-def UpdateTwitter():
 
+try:
+    #Gets information from Current Session for when Chrome is open
+    History = open(History + "/Current Session")
+    History = History.read()
+    
+    start = History.rfind("http")
+    end = History.find(chr(0),start)
+    
+    Site = History[start:end].split("0")[0]
+          
+        #for i in range(0, len(str(CurrentSession))):
+        #if(str(CurrentSession)[0:i] in (str(History).split(str(CurrentSession))[0])):
+        #    Site = str(CurrentSession)[0:i]
+        #else:
+#    break
+except:
+    #Gets information from History for when chrome is closed
+    Now = 1
     try:
-        try:
-            #Gets information from Current Session for when Chrome is open
-            History = open(History + "/Current Session")
-            History = History.read()
-            
-            start = History.rfind("http")
-            end = History.find(chr(0),start)
-            
-            Site = History[start:end].split("0")[0]
-                  
-                #for i in range(0, len(str(CurrentSession))):
-                #if(str(CurrentSession)[0:i] in (str(History).split(str(CurrentSession))[0])):
-                #    Site = str(CurrentSession)[0:i]
-                #else:
-        #    break
-        except:
-            #Gets information from History for when chrome is closed
-            Now = 1
-            try:
-                History = History.split("/Current Session")[0]
-            except:
-                print("No Problem")
-
-            shutil.copyfile(History + "/History", "History")
-
-            History = "History"
-
-            console = sqlite3.connect(History)
-            cursor = console.cursor()
-                
-            cursor.execute("SELECT * FROM urls")
-                
-            rows = cursor.fetchall()
-                
-            Site = str(rows[len(rows)-1]).split("'")[1].split("'")[0]
+        History = History.split("/Current Session")[0]
     except:
-        Site = "https://www.plymouth.ac.uk"
+        print("No Problem")
 
-    SentTweet = False
+    shutil.copyfile(History + "/History", "History")
 
-    SiteData = urllib.urlopen(str(Site))
-    SiteData2 = urllib.urlopen(str(Site))
-    SiteTitle = SiteData2.read().split("<title>")[1].split("</title>")[0]
-    image = ""
-    try:
-        image = SiteData.read().split("<img")[2]
-        image = image.split('src="')[1].split('"')[0]
-        urllib.urlretrieve(image, "Header.jpg")
-        api.UpdateBanner("Header.jpg")
-        api.UpdateImage("Header.jpg")
-    except:
-        #This may cause it to stop working but hopefully you can see what I was trying to get working here,
-        #IT is currently missing the phantomjs files which I struggled to download with it taking over an hour to download a 15mb file.
-        #depot = DepotManager.get()
+    History = "History"
+
+    console = sqlite3.connect(History)
+    cursor = console.cursor()
         
-        #--- WEB GRABBING BIT ---
-        try:
-            driver = webdriver.Chrome("/Users/christophersmith/Desktop/DAT505/Twitter/chromedriver")
-            driver.set_window_size(1024, 768) # set the window size that you need
-            driver.get(Site)
-            driver.save_screenshot('Header.png')
-            api.updateBanner("Header.png")
-        except:
-            print("I guess I should except this isn't going to work:(")
+    cursor.execute("SELECT * FROM urls")
+        
+    rows = cursor.fetchall()
+        
+    Site = str(rows[len(rows)-1]).split("'")[1].split("'")[0]
 
-    for i in range(0, len(Sites)):
-        if(Sites[i] in Site):
-            Tweet = api.PostUpdate(Comments[i][Now] + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
-            SentTweet = True
-    if(SentTweet == False):
-        if(Now == 0):
-            Tweet = api.PostUpdate("I am currently at " + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
-        elif(Now == 1):
-            Tweet = api.PostUpdate("I have been visiting " + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
 
-UpdateTwitter()
+SentTweet = False
 
-while True:
-    timer.sleep(3000)
+SiteData = urllib.urlopen(str(Site))
+SiteData2 = urllib.urlopen(str(Site))
+SiteTitle = SiteData2.read().split("<title>")[1].split("</title>")[0]
+image = ""
+try:
+    image = SiteData.read().split("<img")[2]
+    image = image.split('src="')[1].split('"')[0]
+    urllib.urlretrieve(image, "Header.jpg")
+    api.UpdateBanner("Header.jpg")
+    api.UpdateImage("Header.jpg")
+except:
+    #This may cause it to stop working but hopefully you can see what I was trying to get working here,
+    #IT is currently missing the phantomjs files which I struggled to download with it taking over an hour to download a 15mb file.
+    #depot = DepotManager.get()
+    
+    #--- WEB GRABBING BIT ---
+    try:
+        driver = webdriver.Chrome("/Users/cwsmith/Desktop/DAT505/Twitter/chromedriver")
+        driver.set_window_size(1024, 768) # set the window size that you need
+        driver.get(Site)
+        driver.save_screenshot('Header.png')
+        driver.close()
+        api.UpdateBanner("Header.png")
+    except:
+        print("I guess I should except this isn't going to work:(")
+
+for i in range(0, len(Sites)):
+    if(Sites[i] in Site):
+        Tweet = api.PostUpdate(Comments[i][Now] + str(Site) + "\n#" + (SiteTitle.replace(" ", "_")))
+        SentTweet = True
+if(SentTweet == False):
+    if(Now == 0):
+        Tweet = api.PostUpdate("I am currently at " + str(Site) + "\n#" + (SiteTitle.replace(" ", "_")))
+    elif(Now == 1):
+        Tweet = api.PostUpdate("I have been visiting " + str(Site) + "\n#" + (SiteTitle.replace(" ", "_")))
+print("It's worked " + Site)
+
+
+
+#while True:
+# timer.sleep(3000)
 

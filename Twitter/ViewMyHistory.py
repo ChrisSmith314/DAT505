@@ -79,8 +79,8 @@ try:
 except:
     #This may cause it to stop working but hopefully you can see what I was trying to get working here,
     #IT is currently missing the phantomjs files which I struggled to download with it taking over an hour to download a 15mb file.
-    depot = DepotManager.get()
-    driver = webdriver.PhantomJS()
+    #depot = DepotManager.get()
+    driver = webdriver.Chrome("/Users/christophersmith/Desktop/DAT505/Twitter/chromedriver")
     driver.set_window_size(1024, 768) # set the window size that you need
     driver.get(Site)
     driver.save_screenshot('Header.png')
@@ -88,11 +88,11 @@ except:
 
 for i in range(0, len(Sites)):
     if(Sites[i] in Site):
-        Tweet = api.PostUpdate(Comments[i][Now] + str(BeautifulSoup(Site)) + "\n#" + SiteTitle)
+        Tweet = api.PostUpdate(Comments[i][Now] + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
         SentTweet = True
 if(SentTweet == False):
     if(Now == 0):
-        Tweet = api.PostUpdate("I am currently at " + str(BeautifulSoup(Site)) + "\n#" + SiteTitle)
+        Tweet = api.PostUpdate("I am currently at " + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
     elif(Now == 1):
-        Tweet = api.PostUpdate("I have been visiting " + str(BeautifulSoup(Site)) + "\n#" + SiteTitle)
+        Tweet = api.PostUpdate("I have been visiting " + str(BeautifulSoup(Site)) + "\n#" + (SiteTitle.replace(" ", "_")))
 
